@@ -122,8 +122,8 @@ public class LoginFrame extends javax.swing.JFrame {
             return;
         }
 
-        JOptionPane.showMessageDialog(this,
-            "Welcome, " + user.getFullName() + " (" + user.getRole() + ")");
+            new DashboardFrame(user).setVisible(true);
+                this.dispose();
     }//GEN-LAST:event_btnLoginActionPerformed
 
     private void txtPasswordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPasswordActionPerformed
