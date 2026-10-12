@@ -13,7 +13,7 @@ public class DashboardFrame extends JFrame {
 
         setTitle("Quiz Management System - Dashboard");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setSize(420, 460);
+        setSize(420, 560);
         setLocationRelativeTo(null);
 
         JPanel root = new JPanel(new BorderLayout(10, 10));
@@ -27,59 +27,37 @@ public class DashboardFrame extends JFrame {
 
         JPanel buttons = new JPanel(new GridLayout(0, 1, 0, 10));
 
+        // Admin-only buttons
         if (user.isAdmin()) {
-            
-            JButton btnQuizzes = new JButton("Manage Quizzes");
-            btnQuizzes.addActionListener(e -> {
-                new ManageQuizzesFrame(currentUser).setVisible(true);
-                dispose();
-            });
-            buttons.add(btnQuizzes);
-            
-            JButton btnQuestions = new JButton("Manage Questions");
-            btnQuestions.addActionListener(e -> {
-                new ManageQuestionsFrame(currentUser).setVisible(true);
-                dispose();
-            });
-            buttons.add(btnQuestions);
-            
-            JButton btnUsers = new JButton("Manage Users");
-            btnUsers.addActionListener(e -> {
-                new ManageUsersFrame(currentUser).setVisible(true);
-                dispose();
-            });
-            buttons.add(btnUsers);
+            buttons.add(makeButton("Manage Quizzes",
+                    () -> new ManageQuizzesFrame(currentUser)));
+            buttons.add(makeButton("Manage Questions",
+                    () -> new ManageQuestionsFrame(currentUser)));
+            buttons.add(makeButton("Manage Users",
+                    () -> new ManageUsersFrame(currentUser)));
         }
-        JButton btnTakeQuiz = new JButton("Take Quiz");
-        btnTakeQuiz.addActionListener(e -> {
-            new QuizTakeFrame(currentUser).setVisible(true);
-            dispose();
-        });
-        buttons.add(btnTakeQuiz);
-        
-        JButton btnResults = new JButton(user.isAdmin() ? "All Results" : "My Results");
-        btnResults.addActionListener(e -> {
-            new ResultsFrame(currentUser).setVisible(true);
-            dispose();
-        });
-        buttons.add(btnResults);
 
-        JButton btnLogout = new JButton("Logout");
-        btnLogout.addActionListener(e -> {
-            new LoginFrame().setVisible(true);
-            dispose();
-        });
-        buttons.add(btnLogout);
+        // Everyone
+        buttons.add(makeButton("Take Quiz",
+                () -> new QuizTakeFrame(currentUser)));
+        buttons.add(makeButton(user.isAdmin() ? "All Results" : "My Results",
+                () -> new ResultsFrame(currentUser)));
+        buttons.add(makeButton("Settings",
+                () -> new SettingsFrame(currentUser)));
+        buttons.add(makeButton("Logout",
+                () -> new LoginFrame()));
 
         root.add(buttons, BorderLayout.CENTER);
         setContentPane(root);
     }
 
-    // Each button shows a placeholder for now.
-    // Teammates later replace the message with code that opens their window.
-    private JButton makeButton(String text) {
+    // Makes a button that opens the given window and closes the dashboard
+    private JButton makeButton(String text, java.util.function.Supplier<JFrame> windowToOpen) {
         JButton b = new JButton(text);
-        b.addActionListener(e -> JOptionPane.showMessageDialog(this, text + " window coming soon."));
+        b.addActionListener(e -> {
+            windowToOpen.get().setVisible(true);
+            dispose();
+        });
         return b;
     }
 }
