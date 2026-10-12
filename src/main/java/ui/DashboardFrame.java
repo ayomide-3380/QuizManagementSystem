@@ -38,7 +38,13 @@ public class DashboardFrame extends JFrame {
             dispose();
         });
         buttons.add(btnTakeQuiz);
-        buttons.add(makeButton("My Results"));
+        
+        JButton btnResults = new JButton(user.isAdmin() ? "All Results" : "My Results");
+        btnResults.addActionListener(e -> {
+            new ResultsFrame(currentUser).setVisible(true);
+            dispose();
+        });
+        buttons.add(btnResults);
 
         JButton btnLogout = new JButton("Logout");
         btnLogout.addActionListener(e -> {
