@@ -35,4 +35,37 @@ public class UserDAO {
         }
         return null;
     }
+
+    // True if someone already uses this username
+    public boolean usernameExists(String username) {
+        String sql = "SELECT 1 FROM users WHERE username = ?";
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, username);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    // Creates a new STUDENT account. Returns true if it was saved.
+    public boolean register(String fullName, String username, String password) {
+        String sql = "INSERT INTO users (full_name, username, password, role_id) "
+                   + "VALUES (?, ?, ?, (SELECT id FROM roles WHERE name = 'STUDENT'))";
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, fullName);
+            ps.setString(2, username);
+            ps.setString(3, password);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 }
