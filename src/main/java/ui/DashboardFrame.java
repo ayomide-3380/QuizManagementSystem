@@ -28,7 +28,14 @@ public class DashboardFrame extends JFrame {
         JPanel buttons = new JPanel(new GridLayout(0, 1, 0, 10));
 
         if (user.isAdmin()) {
-            buttons.add(makeButton("Manage Quizzes"));
+            
+            JButton btnQuizzes = new JButton("Manage Quizzes");
+            btnQuizzes.addActionListener(e -> {
+                new ManageQuizzesFrame(currentUser).setVisible(true);
+                dispose();
+            });
+            buttons.add(btnQuizzes);
+            
             buttons.add(makeButton("Manage Questions"));
             buttons.add(makeButton("Manage Users"));
         }
