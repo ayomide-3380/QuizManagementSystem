@@ -1,4 +1,4 @@
-package com.ayomide;
+package com.quiz;
 
 import dao.QuestionDAO;
 import dao.QuizDAO;

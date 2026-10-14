@@ -126,4 +126,30 @@ public class QuestionDAO {
             ps.executeBatch();
         }
     }
+
+    public int getTotalQuestionCount() {
+        String sql = "SELECT COUNT(*) FROM questions";
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) return rs.getInt(1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public int getQuestionCountByQuiz(int quizId) {
+        String sql = "SELECT COUNT(*) FROM questions WHERE quiz_id = ?";
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, quizId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
 }

@@ -1,84 +1,108 @@
-# Quiz Management System
+# Quiz Management System (QMS)
 
-A desktop quiz application built with **Java Swing**, **JDBC** and **MySQL**.
-Administrators create quizzes and questions and manage users. Students register,
-take quizzes and see their scores.
+A professional desktop quiz management and assessment application built with **Java Swing (FlatLaf Modern Design System)**, **JDBC**, and **MySQL**.
 
-## Team
+Supports role-based administration (Admin & Student), interactive timed assessments with live progress tracking, question authoring with 4-choice validation, comprehensive score tracking, and profile management.
 
-- Ayomide (write your teammates' names here)
+---
 
-## Features
+## ✨ Features
 
-- Login and student registration
-- Role-based dashboard (ADMIN and STUDENT)
-- Admin: manage quizzes, manage questions (with answer options), manage users
-- Student: take a quiz one question at a time, go back and change answers,
-  automatic scoring, view past results
-- Admin can view every student's results
-- Settings window to change your own name and password
-- Clear message when the database is not running
+- **Modern & Clean UI**: Custom design system built on **FlatLaf** featuring card layouts, smooth focus states, cohesive color palettes, responsive typography, and generous table row heights.
+- **Role-Based Access**:
+  - **Administrator**:
+    - **Live Dashboard**: High-level metrics (Active Quizzes, Total Questions, Registered Students, Total Attempts).
+    - **Quiz Management**: Create, edit, search, and delete quizzes with live keyword filtering.
+    - **Question Management**: Full multiple-choice question authoring with automatic answer option validation.
+    - **User Administration**: View all registered students, assign roles, and reset passwords.
+    - **Gradebook & Reports**: Search and view test history and performance across all students.
+  - **Student**:
+    - **Interactive Assessments**: Clean card-based question cards with previous/next navigation, progress bar, answered counters, and instant scoring.
+    - **Personal Performance**: View past scores, percentages, and completed dates.
+    - **Account Settings**: Update display name and change password securely.
+- **Robust Database Layer**: Clean DAO separation with foreign key cascading and transaction safety.
+- **Convenient Windows Launcher**: One-click `run.bat` launcher that checks MySQL status and runs the application.
 
-## Requirements
+---
 
-- JDK 26 (the version set in `pom.xml`) or newer
-- Apache NetBeans
-- XAMPP (for MySQL and phpMyAdmin)
-- Internet on the first run, so Maven can download the libraries
+## 🚀 Quick Start
 
-## Setup
+### 1. Requirements
+- **Java SE Development Kit (JDK 17 LTS)** or newer
+- **MySQL Server** (e.g. via XAMPP on port `3306`)
 
-1. **Start MySQL.** Open the XAMPP Control Panel and click **Start** next to MySQL.
-2. **Create the database.** Open http://localhost/phpmyadmin (start the Apache module
-   too if it does not load), click the **SQL** tab, paste the contents of
-   `database.sql` and click **Go**. This creates `quiz_db` with all its tables.
-3. **Open the project** in NetBeans: File > Open Project, then choose this folder.
-4. **Check the connection settings** in `src/main/java/dao/DBConnection.java`.
-   The defaults match a fresh XAMPP install:
+### 2. Database Setup
+1. Ensure MySQL is running on `localhost:3306`.
+2. Run or import `database.sql` into MySQL. This creates `quiz_db` with all necessary tables, cascading foreign keys, and seed sample quizzes.
+   ```powershell
+   # If using MySQL command line:
+   mysql -u root -e "SOURCE database.sql;"
+   ```
 
-   | Setting  | Value       |
-   |----------|-------------|
-   | Host     | `localhost` |
-   | Port     | `3306`      |
-   | Database | `quiz_db`   |
-   | User     | `root`      |
-   | Password | *(empty)*   |
+### 3. Run the Application
+You can run the application in any of the following ways:
 
-5. **Run** the project (Shift+F6). The Login window should open.
-
-## Default login
-
-| Role  | Username | Password   |
-|-------|----------|------------|
-| Admin | `admin`  | `admin123` |
-
-Students create their own accounts with the **Register** button on the login window.
-
-## Project structure
-
-```
-src/main/java/
-  com/ayomide/   QuizManagementSystem.java   (starts the app)
-  model/         User, Quiz, Question, Option, Attempt
-  dao/           DBConnection, UserDAO, QuizDAO, QuestionDAO, AttemptDAO
-  ui/            LoginFrame, RegisterFrame, DashboardFrame,
-                 ManageQuizzesFrame, ManageQuestionsFrame, ManageUsersFrame,
-                 QuizTakeFrame, ResultsFrame, SettingsFrame
-database.sql     (creates the database)
+#### Option A: One-Click Script (Recommended)
+Double-click `run.bat` in the project root or run in PowerShell:
+```powershell
+.\run.bat
 ```
 
-The windows never write SQL themselves. They call a DAO class, and the DAO talks to
-the database.
+#### Option B: Standalone JAR
+```powershell
+java -jar target/QuizManagementSystem-1.0-SNAPSHOT.jar
+```
 
-## Troubleshooting
+#### Option C: Maven Command
+```powershell
+mvn clean compile exec:java
+```
 
-- **"Database not available" message:** MySQL is not running. Start it in XAMPP,
-  check that `quiz_db` exists, and run the app again.
-- **Red errors after a pull:** right-click the project and choose **Reload POM**.
-- **A teammate's database looks different:** everyone must run `database.sql`
-  on their own XAMPP.
+---
 
-## Notes
+## 🔑 Default Accounts
 
-Passwords are stored as plain text to keep this school project simple. A real
-application would store hashed passwords.
+| Role | Username | Password | Notes |
+|---|---|---|---|
+| **Admin** | `admin` | `admin123` | Full administrative control |
+| **Student** | `sarah` | `student123` | Sample student with test records |
+| **Student** | `alex` | `student123` | Sample student |
+
+> New students can also click **"Create New Account"** on the login screen to register instantly.
+
+---
+
+## 📁 Project Architecture
+
+```
+QuizManagementSystem/
+├── run.bat                          # One-click Windows application launcher
+├── pom.xml                          # Maven build definition (Java 17, FlatLaf, MySQL Connector)
+├── database.sql                     # Database schema, foreign keys, and sample seed data
+└── src/main/java/
+    ├── com/quiz/
+    │   └── QuizManagementSystem.java  # Main application launcher & bootstrap
+    ├── model/
+    │   ├── User.java                # User model (Admin / Student)
+    │   ├── Quiz.java                # Quiz entity
+    │   ├── Question.java            # Question entity with options list
+    │   ├── Option.java              # Answer choice entity
+    │   └── Attempt.java             # Submission entity & scoring
+    ├── dao/
+    │   ├── DBConnection.java        # JDBC connection pooling & availability probe
+    │   ├── UserDAO.java             # User login, registration, and management
+    │   ├── QuizDAO.java             # Quiz CRUD & counting
+    │   ├── QuestionDAO.java         # Question CRUD, batch options & counts
+    │   └── AttemptDAO.java          # Quiz scoring, submissions, and metrics
+    └── ui/
+        ├── UITheme.java             # Design system tokens, styles, cards, and tables
+        ├── LoginFrame.java          # Modern auth card with Enter-key submit
+        ├── RegisterFrame.java       # Student account creation
+        ├── DashboardFrame.java      # Metric cards & role-based quick action cards
+        ├── ManageQuizzesFrame.java  # Quiz list with real-time filter & form
+        ├── ManageQuestionsFrame.java# Question & 4-option authoring editor
+        ├── ManageUsersFrame.java    # Account management table & editor
+        ├── QuizTakeFrame.java       # Interactive quiz taking & scoring dialog
+        ├── ResultsFrame.java        # Gradebook with search and score stats
+        └── SettingsFrame.java       # Profile update and password change
+```

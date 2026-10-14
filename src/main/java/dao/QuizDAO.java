@@ -78,4 +78,17 @@ public class QuizDAO {
         }
         return false;
     }
+
+    // Returns total number of quizzes
+    public int getQuizCount() {
+        String sql = "SELECT COUNT(*) FROM quizzes";
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) return rs.getInt(1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
 }

@@ -1,181 +1,221 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
 package ui;
 
 import dao.UserDAO;
-import javax.swing.JOptionPane;
+import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import model.User;
 
 /**
- *
- * @author Admin
+ * Modern, high-conversion Login Window featuring branded application icon,
+ * theme toggle, password visibility switcher, and instant demo account buttons.
  */
-public class LoginFrame extends javax.swing.JFrame {
-    
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(LoginFrame.class.getName());
+public class LoginFrame extends JFrame {
 
-    /**
-     * Creates new form LoginFrame
-     */
+    private final JTextField txtUsername = new JTextField();
+    private final JPasswordField txtPassword = new JPasswordField();
+    private final JButton btnLogin = UITheme.createPrimaryButton("Sign In to Portal →");
+    private final JButton btnRegister = UITheme.createSecondaryButton("Create Student Account");
+    private final JLabel lblFeedback = new JLabel(" ", SwingConstants.CENTER);
+    private boolean showPassword = false;
+
     public LoginFrame() {
-        initComponents();
+        setTitle("Quiz Management System - Secure Login");
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setSize(500, 630);
+        setResizable(false);
         setLocationRelativeTo(null);
+        UITheme.applyWindowIcon(this);
+
+        JPanel root = new JPanel(new BorderLayout());
+        root.setBackground(UITheme.BG_APP);
+        root.setBorder(new EmptyBorder(22, 38, 22, 38));
+
+        // Top bar with Theme Toggle
+        JPanel topBar = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+        topBar.setOpaque(false);
+        JButton btnTheme = UITheme.createThemeToggle(this);
+        topBar.add(btnTheme);
+        root.add(topBar, BorderLayout.NORTH);
+
+        // Card Container
+        JPanel card = UITheme.createCardPanel();
+        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
+
+        // Brand Banner
+        JLabel iconLbl = new JLabel("🎓", SwingConstants.CENTER);
+        iconLbl.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 44));
+        iconLbl.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JLabel badge = new JLabel("  ENTERPRISE ASSESSMENT PORTAL  ");
+        badge.setFont(UITheme.FONT_BADGE);
+        badge.setForeground(UITheme.PRIMARY);
+        badge.setBackground(UITheme.PRIMARY_LIGHT);
+        badge.setOpaque(true);
+        badge.setBorder(new LineBorder(new Color(191, 219, 254), 1, true));
+        badge.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JLabel title = new JLabel("Welcome Back");
+        title.setFont(UITheme.FONT_HERO);
+        title.setForeground(UITheme.TEXT_TITLE);
+        title.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JLabel subtitle = new JLabel("Enter your credentials to access your dashboard");
+        subtitle.setFont(UITheme.FONT_SUBTITLE);
+        subtitle.setForeground(UITheme.TEXT_MUTED);
+        subtitle.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        card.add(iconLbl);
+        card.add(Box.createVerticalStrut(4));
+        card.add(badge);
+        card.add(Box.createVerticalStrut(8));
+        card.add(title);
+        card.add(Box.createVerticalStrut(4));
+        card.add(subtitle);
+        card.add(Box.createVerticalStrut(16));
+
+        // Inline Feedback Notification
+        lblFeedback.setFont(UITheme.FONT_SMALL);
+        lblFeedback.setForeground(UITheme.DANGER);
+        lblFeedback.setAlignmentX(Component.CENTER_ALIGNMENT);
+        card.add(lblFeedback);
+        card.add(Box.createVerticalStrut(6));
+
+        // Inputs Section
+        UITheme.styleInput(txtUsername);
+        UITheme.styleInput(txtPassword);
+        txtUsername.putClientProperty("JTextField.placeholderText", "Enter your username");
+        txtPassword.putClientProperty("JTextField.placeholderText", "Enter your password");
+
+        JPanel userPanel = UITheme.createFormField("Username", txtUsername);
+        userPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        userPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 60));
+
+        // Password field with toggle visibility button
+        JPanel passContainer = new JPanel(new BorderLayout(6, 0));
+        passContainer.setOpaque(false);
+        passContainer.add(txtPassword, BorderLayout.CENTER);
+
+        JButton btnTogglePass = new JButton("👁");
+        btnTogglePass.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 14));
+        btnTogglePass.setFocusPainted(false);
+        btnTogglePass.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnTogglePass.setPreferredSize(new Dimension(42, 36));
+        btnTogglePass.setBackground(UITheme.BG_CARD);
+        btnTogglePass.setBorder(new LineBorder(UITheme.BORDER, 1, true));
+        btnTogglePass.addActionListener(e -> {
+            showPassword = !showPassword;
+            txtPassword.setEchoChar(showPassword ? (char) 0 : '•');
+            btnTogglePass.setText(showPassword ? "🔒" : "👁");
+        });
+        passContainer.add(btnTogglePass, BorderLayout.EAST);
+
+        JPanel passPanel = UITheme.createFormField("Password", passContainer);
+        passPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        passPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 60));
+
+        card.add(userPanel);
+        card.add(Box.createVerticalStrut(10));
+        card.add(passPanel);
+        card.add(Box.createVerticalStrut(18));
+
+        // Buttons Section
+        btnLogin.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnLogin.setMaximumSize(new Dimension(Integer.MAX_VALUE, 42));
+        btnLogin.setPreferredSize(new Dimension(340, 42));
+
+        btnRegister.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnRegister.setMaximumSize(new Dimension(Integer.MAX_VALUE, 38));
+        btnRegister.setPreferredSize(new Dimension(340, 38));
+
+        btnLogin.addActionListener(e -> doLogin());
+        btnRegister.addActionListener(e -> {
+            new RegisterFrame().setVisible(true);
+            dispose();
+        });
+
+        KeyAdapter enterListener = new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) doLogin();
+            }
+        };
+        txtUsername.addKeyListener(enterListener);
+        txtPassword.addKeyListener(enterListener);
+
+        card.add(btnLogin);
+        card.add(Box.createVerticalStrut(10));
+        card.add(btnRegister);
+        card.add(Box.createVerticalStrut(16));
+
+        // Quick Fill Demo Accounts
+        JPanel quickDemo = new JPanel(new FlowLayout(FlowLayout.CENTER, 8, 4));
+        quickDemo.setOpaque(false);
+        JLabel lblQuick = new JLabel("Quick login demo:");
+        lblQuick.setFont(UITheme.FONT_SMALL);
+        lblQuick.setForeground(UITheme.TEXT_MUTED);
+        quickDemo.add(lblQuick);
+
+        JButton chipAdmin = makeDemoChip("👑 Admin", "admin", "admin123");
+        JButton chipSarah = makeDemoChip("🎓 Sarah", "sarah", "student123");
+        JButton chipAlex = makeDemoChip("🧪 Alex", "alex", "student123");
+        quickDemo.add(chipAdmin);
+        quickDemo.add(chipSarah);
+        quickDemo.add(chipAlex);
+
+        quickDemo.setAlignmentX(Component.CENTER_ALIGNMENT);
+        card.add(quickDemo);
+
+        root.add(card, BorderLayout.CENTER);
+        setContentPane(root);
+        getRootPane().setDefaultButton(btnLogin);
     }
 
-    /**
-     * This method is called from within the constructor to initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is always
-     * regenerated by the Form Editor.
-     */
-    @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-    private void initComponents() {
+    private JButton makeDemoChip(String label, String username, String password) {
+        JButton btn = new JButton(label);
+        btn.setFont(UITheme.FONT_BADGE);
+        btn.setForeground(UITheme.PRIMARY);
+        btn.setBackground(UITheme.PRIMARY_LIGHT);
+        btn.setBorder(new LineBorder(new Color(191, 219, 254), 1, true));
+        btn.setFocusPainted(false);
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btn.addActionListener(e -> {
+            txtUsername.setText(username);
+            txtPassword.setText(password);
+            lblFeedback.setText(" ");
+            txtPassword.requestFocus();
+        });
+        return btn;
+    }
 
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        txtUsername = new javax.swing.JTextField();
-        jLabel3 = new javax.swing.JLabel();
-        btnLogin = new javax.swing.JButton();
-        txtPassword = new javax.swing.JPasswordField();
-        btnRegister = new javax.swing.JButton();
-
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-
-        jLabel1.setFont(new java.awt.Font("Segoe UI Semibold", 1, 13)); // NOI18N
-        jLabel1.setText("  QuizManagementSystem");
-
-        jLabel2.setFont(new java.awt.Font("Segoe UI Symbol", 0, 13)); // NOI18N
-        jLabel2.setText("Username:");
-
-        jLabel3.setFont(new java.awt.Font("Segoe UI Symbol", 0, 13)); // NOI18N
-        jLabel3.setText("Password:");
-
-        btnLogin.setFont(new java.awt.Font("Segoe UI Semibold", 1, 13)); // NOI18N
-        btnLogin.setText("Login");
-        btnLogin.addActionListener(this::btnLoginActionPerformed);
-
-        txtPassword.addActionListener(this::txtPasswordActionPerformed);
-
-        btnRegister.setFont(new java.awt.Font("Segoe UI Semibold", 1, 13)); // NOI18N
-        btnRegister.setText("Register");
-        btnRegister.addActionListener(this::btnRegisterActionPerformed);
-
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(88, 88, 88)
-                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addGroup(layout.createSequentialGroup()
-                            .addGap(31, 31, 31)
-                            .addComponent(jLabel3)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(txtPassword, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                            .addGap(28, 28, 28)
-                            .addComponent(jLabel2)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(txtUsername, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(66, 66, 66)
-                        .addComponent(btnLogin)
-                        .addGap(64, 64, 64)
-                        .addComponent(btnRegister)))
-                .addContainerGap(119, Short.MAX_VALUE))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
-                    .addComponent(txtUsername, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel3)
-                    .addComponent(txtPassword, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(36, 36, 36)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnLogin)
-                    .addComponent(btnRegister))
-                .addContainerGap(124, Short.MAX_VALUE))
-        );
-
-        pack();
-    }// </editor-fold>//GEN-END:initComponents
-
-    private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoginActionPerformed
+    private void doLogin() {
         String username = txtUsername.getText().trim();
         String password = new String(txtPassword.getPassword());
 
         if (username.isEmpty() || password.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Please enter your username and password.",
-                "Missing details", JOptionPane.WARNING_MESSAGE);
+            lblFeedback.setText("⚠ Please enter both your username and password.");
+            lblFeedback.setForeground(UITheme.DANGER);
             return;
         }
 
         User user = new UserDAO().login(username, password);
-
         if (user == null) {
-            JOptionPane.showMessageDialog(this, "Wrong username or password.",
-                "Login failed", JOptionPane.ERROR_MESSAGE);
+            lblFeedback.setText("✖ Invalid username or password. Please try again.");
+            lblFeedback.setForeground(UITheme.DANGER);
             txtPassword.setText("");
+            txtPassword.requestFocus();
             return;
         }
 
-            new DashboardFrame(user).setVisible(true);
-                this.dispose();
-    }//GEN-LAST:event_btnLoginActionPerformed
-
-    private void txtPasswordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPasswordActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtPasswordActionPerformed
-
-    private void btnRegisterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegisterActionPerformed
-        new RegisterFrame().setVisible(true);
-        this.dispose();
-    }//GEN-LAST:event_btnRegisterActionPerformed
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
-            logger.log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new LoginFrame().setVisible(true));
+        new DashboardFrame(user).setVisible(true);
+        dispose();
     }
 
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnLogin;
-    private javax.swing.JButton btnRegister;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JPasswordField txtPassword;
-    private javax.swing.JTextField txtUsername;
-    // End of variables declaration//GEN-END:variables
+    public static void main(String[] args) {
+        UITheme.setupTheme();
+        SwingUtilities.invokeLater(() -> new LoginFrame().setVisible(true));
+    }
 }
